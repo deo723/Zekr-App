@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>تطبيق ذكر وحياة الشامل</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%); color: #fff; margin: 0; padding: 20px; min-height: 100vh; }
+        .section { background: rgba(27, 40, 54, 0.8); padding: 20px; margin-bottom: 20px; border-radius: 15px; border: 1px solid #34495e; backdrop-filter: blur(5px); }
+        h2 { color: #4caf50; text-align: center; cursor: pointer; border-bottom: 1px solid #4caf50; padding-bottom: 10px; }
+        .content-box { display: none; padding-top: 15px; }
+        .active { display: block; }
+        .prayer-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; text-align: center; }
+        .dua-item { background: #2c3e50; padding: 10px; margin: 5px 0; border-radius: 8px; border-right: 4px solid #4caf50; }
+        .quran-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .surah-link { background: #1b2836; padding: 10px; text-align: center; border-radius: 8px; text-decoration: none; color: #fff; border: 1px solid #4caf50; transition: 0.3s; }
+        .surah-link:hover { background: #4caf50; }
+        /* ستايل العداد */
+        .dhikr-box { text-align: center; padding: 20px; }
+        .counter { font-size: 3em; color: #4caf50; margin: 10px 0; }
+        .btn-count { background: #4caf50; border: none; padding: 15px 30px; border-radius: 50px; color: #fff; font-weight: bold; cursor: pointer; transition: 0.3s; }
+    </style>
+</head>
+<body>
+
+    <div class="section">
+        <h2 onclick="toggle(1)">مواقيت الصلاة في القاهرة 🕌</h2>
+        <div id="p1" class="content-box active"><div id="prayer-times" class="prayer-grid">جاري التحديث...</div></div>
+    </div>
+
+    <div class="section">
+        <h2 onclick="toggle(4)">عداد الاستغفار 📿</h2>
+        <div id="p4" class="content-box">
+            <div class="dhikr-box">
+                <div class="counter" id="count">0</div>
+                <button class="btn-count" onclick="increment()">أستغفر الله</button>
+                <button class="btn-count" style="background:#e74c3c" onclick="reset()">صفر العداد</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2 onclick="toggle(2)">الأدعية المأثورة 🤲</h2>
+        <div id="p2" class="content-box"></div>
+    </div>
+
+    <div class="section">
+        <h2 onclick="toggle(3)">سور جزء عم (37 سورة) 📖</h2>
+        <div id="p3" class="content-box"><div class="quran-grid" id="quran-list"></div></div>
+    </div>
+
+    <script>
+        function toggle(id) { document.getElementById('p'+id).classList.toggle('active'); }
+        
+        // عداد الاستغفار
+        let c = 0;
+        function increment() { c++; document.getElementById('count').innerText = c; }
+        function reset() { c = 0; document.getElementById('count').innerText = c; }
+
+        fetch('https://api.aladhan.com/v1/timingsByCity?city=Cairo&country=Egypt&method=5')
+            .then(r => r.json()).then(data => {
+                const t = data.data.timings;
+                document.getElementById('prayer-times').innerHTML = `<div>الفجر<br>${t.Fajr}</div><div>الظهر<br>${t.Dhuhr}</div><div>العصر<br>${t.Asr}</div><div>المغرب<br>${t.Maghrib}</div><div>العشاء<br>${t.Isha}</div>`;
+            });
+
+        const duas = ["اللهم إني أسألك علماً نافعاً", "ربنا آتنا في الدنيا حسنة", "اللهم أعني على ذكرك", "يا مقلب القلوب ثبت قلبي", "لا إله إلا أنت سبحانك", "اللهم إني أعوذ بك من الهم", "اللهم اغفر لي ولوالدي", "اللهم إني أسألك الهدى", "اللهم مصرف القلوب", "حسبي الله ونعم الوكيل", "اللهم صلِّ على محمد", "اللهم اجعلنا من الشاكرين", "اللهم استر عوراتنا", "يا حي يا قيوم", "اللهم إنك عفو تحب العفو"];
+        const dList = document.getElementById('p2');
+        duas.forEach(d => dList.innerHTML += `<div class="dua-item">${d}</div>`);
+
+        const surahs = ["النبأ","النازعات","عبس","التكوير","الانفطار","المطففين","الانشقاق","البروج","الطارق","الأعلى","الغاشية","الفجر","البلد","الشمس","الليل","الضحى","الشرح","التين","العلق","القدر","البينة","الزلزلة","العاديات","القارعة","التكاثر","العصر","الهمزة","الفيل","قريش","الماعون","الكوثر","الكافرون","النصر","المسد","الإخلاص","الفلق","الناس"];
+        const qList = document.getElementById('quran-list');
+        surahs.forEach((s, i) => qList.innerHTML += `<a href="https://quran.com/${78+i}" target="_blank" class="surah-link">${s}</a>`);
+    </script>
+</body>
+</html>
